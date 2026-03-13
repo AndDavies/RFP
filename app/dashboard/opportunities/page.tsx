@@ -19,13 +19,15 @@ export default async function OpportunitiesPage() {
               <TableHead>Deadline</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Budget</TableHead>
+              <TableHead>Risk Level</TableHead>
+              <TableHead>AI Match Score</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {opportunities.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-muted-foreground">
-                  No opportunities available.
+                <TableCell colSpan={7} className="text-muted-foreground">
+                  No opportunities available yet.
                 </TableCell>
               </TableRow>
             ) : (
@@ -40,6 +42,8 @@ export default async function OpportunitiesPage() {
                       ? new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(opportunity.budget)
                       : "N/A"}
                   </TableCell>
+                  <TableCell className="capitalize">{opportunity.riskLevel ?? "N/A"}</TableCell>
+                  <TableCell>{opportunity.matchScore !== null ? `${Math.round(opportunity.matchScore)}%` : "N/A"}</TableCell>
                 </TableRow>
               ))
             )}

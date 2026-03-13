@@ -1,73 +1,61 @@
 import { createClient } from "@/lib/supabase/server";
-import { DashboardOpportunity, OpportunityListItem } from "@/types/rfp";
+import { OpportunityItem } from "@/types/rfp";
 
-type DashboardOpportunityRow = {
+type OpportunityRow = {
   id: string;
   title: string;
   agency: string;
   deadline: string | null;
-  rfp_analysis: { match_score: number | null } | Array<{ match_score: number | null }> | null;
-};
-
-type OpportunityListRow = {
-  id: string;
-  title: string;
-  agency: string;
-  deadline: string | null;
+  rfp_analysis:
+    | { match_score: number | null; risk_level: "low" | "medium" | "high" | null }
+    | Array<{ match_score: number | null; risk_level: "low" | "medium" | "high" | null }>
+    | null;
   location: string | null;
   budget: number | null;
 };
 
-export async function getRecentOpportunities(limit = 20): Promise<DashboardOpportunity[]> {
+export async function getOpportunities(): Promise<OpportunityItem[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("rfps")
-    .select("id, title, agency, deadline, rfp_analysis(match_score)")
-    .order("created_at", { ascending: false })
-    .limit(limit);
+    .select("id, title, agency, deadline, location, budget, rfp_analysis(match_score, risk_level)")
+    .order("deadline", { ascending: true })
+    .limit(50);
 
   if (error) {
-    console.error("Failed to fetch recent opportunities", error);
+    console.error("Failed to fetch opportunities", error);
     return [];
   }
 
-  const getMatchScore = (row: DashboardOpportunityRow): number | null => {
+  const getAnalysis = (
+    row: OpportunityRow
+  ): { matchScore: number | null; riskLevel: "low" | "medium" | "high" | null } => {
     if (!row.rfp_analysis) {
-      return null;
+      return { matchScore: null, riskLevel: null };
     }
     if (Array.isArray(row.rfp_analysis)) {
-      return row.rfp_analysis[0]?.match_score ?? null;
+      return {
+        matchScore: row.rfp_analysis[0]?.match_score ?? null,
+        riskLevel: row.rfp_analysis[0]?.risk_level ?? null
+      };
     }
-    return row.rfp_analysis.match_score;
+    return {
+      matchScore: row.rfp_analysis.match_score,
+      riskLevel: row.rfp_analysis.risk_level
+    };
   };
 
-  return (data as DashboardOpportunityRow[]).map((item) => ({
+  return (data as OpportunityRow[]).map((item) => {
+    const analysis = getAnalysis(item);
+    return {
     id: item.id,
     title: item.title,
     agency: item.agency,
     deadline: item.deadline,
-    matchScore: getMatchScore(item)
-  }));
-}
-
-export async function getOpportunities(): Promise<OpportunityListItem[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("rfps")
-    .select("id, title, agency, deadline, location, budget")
-    .order("deadline", { ascending: true });
-
-  if (error) {
-    console.error("Failed to fetch opportunities list", error);
-    return [];
-  }
-
-  return (data as OpportunityListRow[]).map((item) => ({
-    id: item.id,
-    title: item.title,
-    agency: item.agency,
-    deadline: item.deadline,
+    matchScore: analysis.matchScore,
+    riskLevel: analysis.riskLevel,
     location: item.location,
     budget: item.budget
-  }));
+    };
+  });
 }

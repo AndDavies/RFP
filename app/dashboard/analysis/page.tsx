@@ -1,45 +1,51 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getAnalysis } from "@/services/rfp/getAnalysis";
 
 export default async function AnalysisPage() {
   const analysis = await getAnalysis();
 
+  if (analysis.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>RFP Analysis</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">No analysis records available yet.</CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>RFP Analysis</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Summary</TableHead>
-              <TableHead>Risk Level</TableHead>
-              <TableHead>Match Score</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {analysis.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-muted-foreground">
-                  No analysis records found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              analysis.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.title}</TableCell>
-                  <TableCell className="max-w-xl truncate">{item.summary ?? "No summary yet"}</TableCell>
-                  <TableCell className="capitalize">{item.riskLevel ?? "N/A"}</TableCell>
-                  <TableCell>{item.matchScore !== null ? `${Math.round(item.matchScore)}%` : "N/A"}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="grid gap-4">
+      {analysis.map((item) => (
+        <Card key={item.id}>
+          <CardHeader>
+            <CardTitle className="text-lg">{item.title}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p className="text-muted-foreground">{item.summary ?? "No summary available yet."}</p>
+            <div className="flex flex-wrap gap-4">
+              <p>
+                <span className="font-medium">Risk:</span>{" "}
+                <span className="capitalize">{item.riskLevel ?? "N/A"}</span>
+              </p>
+              <p>
+                <span className="font-medium">Match:</span> {item.matchScore !== null ? `${Math.round(item.matchScore)}%` : "N/A"}
+              </p>
+            </div>
+            {item.keyRequirements.length > 0 ? (
+              <div>
+                <p className="mb-1 font-medium">Key Requirements</p>
+                <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+                  {item.keyRequirements.map((requirement) => (
+                    <li key={`${item.id}-${requirement}`}>{requirement}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 }

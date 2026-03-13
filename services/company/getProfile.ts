@@ -28,11 +28,34 @@ function asPastPerformanceArray(value: unknown): PastPerformanceEntry[] {
 
 export async function getProfile(): Promise<CompanyProfile | null> {
   const supabase = await createClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const { data: membership, error: membershipError } = await supabase
+    .from("users")
+    .select("organization_id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (membershipError) {
+    console.error("Failed to resolve organization membership", membershipError);
+    return null;
+  }
+
+  const organizationId = membership?.organization_id;
+  if (!organizationId) {
+    return null;
+  }
+
   const { data, error } = await supabase
     .from("company_profiles")
     .select("id, organization_id, capabilities, certifications, past_performance, created_at")
-    .order("created_at", { ascending: false })
-    .limit(1)
+    .eq("organization_id", organizationId)
     .maybeSingle();
 
   if (error) {

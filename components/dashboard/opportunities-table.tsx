@@ -1,9 +1,9 @@
-import { DashboardOpportunity } from "@/types/rfp";
+import { OpportunityItem } from "@/types/rfp";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type OpportunitiesTableProps = {
-  opportunities: DashboardOpportunity[];
+  opportunities: OpportunityItem[];
 };
 
 export function OpportunitiesTable({ opportunities }: OpportunitiesTableProps) {
@@ -26,7 +26,7 @@ export function OpportunitiesTable({ opportunities }: OpportunitiesTableProps) {
             {opportunities.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="text-muted-foreground">
-                  No opportunities found yet.
+                  No opportunities available yet.
                 </TableCell>
               </TableRow>
             ) : (

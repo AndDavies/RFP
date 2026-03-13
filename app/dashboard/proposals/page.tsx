@@ -14,7 +14,7 @@ export default async function ProposalsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>RFP ID</TableHead>
+              <TableHead>RFP Title</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created</TableHead>
             </TableRow>
@@ -23,13 +23,13 @@ export default async function ProposalsPage() {
             {proposals.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} className="text-muted-foreground">
-                  No proposals found.
+                  No proposals available yet.
                 </TableCell>
               </TableRow>
             ) : (
               proposals.map((proposal) => (
                 <TableRow key={proposal.id}>
-                  <TableCell className="font-mono text-xs">{proposal.rfpId}</TableCell>
+                  <TableCell className="font-medium">{proposal.rfpTitle}</TableCell>
                   <TableCell className="capitalize">{proposal.status.replace("_", " ")}</TableCell>
                   <TableCell>{new Date(proposal.createdAt).toLocaleDateString()}</TableCell>
                 </TableRow>
