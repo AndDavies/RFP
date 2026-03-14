@@ -17,10 +17,21 @@ app/
   layout.tsx
   page.tsx
   auth-actions.ts
+  globals.css
   login/page.tsx
   signup/page.tsx
+  admin/
+    layout.tsx
+    ingestion/
+      loading.tsx
+      page.tsx
+  api/
+    ingest/
+      rfp/
+        route.ts
   dashboard/
     layout.tsx
+    loading.tsx
     page.tsx
     opportunities/page.tsx
     analysis/page.tsx
@@ -29,6 +40,8 @@ app/
     settings/page.tsx
 
 components/
+  admin/
+    RawPayloadViewer.tsx
   ui/
     button.tsx
     card.tsx
@@ -46,20 +59,47 @@ components/
 
 lib/
   utils.ts
+  security/
+    validateIngestionToken.ts
   supabase/
     client.ts
     server.ts
     middleware.ts
 
 services/
+  company/
+    getProfile.ts
+  ingestion/
+    approveRecord.ts
+    getRawRecords.ts
+    rejectRecord.ts
+    storeRawRFP.ts
+  proposals/
+    getProposals.ts
   rfp/
+    getAnalysis.ts
     getOpportunities.ts
 
 types/
+  company.ts
+  ingestion.ts
+  proposal.ts
   rfp.ts
 
 hooks/
   use-auth-user.ts
+
+supabase/
+  config.toml
+  seed.sql
+  migrations/
+    20260313195900_init_rfp_intelligence_schema.sql
+
+docs/
+  PRD.md
+  13032026.md
+
+proxy.ts
 ```
 
 ## Run Locally
@@ -114,4 +154,3 @@ Vercel auto-detects Next.js and builds with:
 ```bash
 npm run build
 ```
-# RFP
